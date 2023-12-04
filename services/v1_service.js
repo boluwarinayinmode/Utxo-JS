@@ -1,7 +1,6 @@
 const data = require("../database/test.json");
 const rangeData = require("../database/rangeTestData.json");
-
-//const allTransactions = require()
+const fs = require("fs");
 
 const getAllTransactions = () => {
   const input = data;
@@ -84,27 +83,32 @@ const getOneTransaction = (userAddress) => {
   return result;
 };
 
+/**
+ * Return list of transactions and users within the given time range
+ * NOTE: if range were not given will return all transactions
+ * @param {string} startTime 
+ * @param {string} endTime 
+ * @returns {object} - All transactions and users within the given time range
+ */
 const getTransactionsByTimeRange = (startTime, endTime) => {
   const result = {
     users: [],
     transactions: [],
   };
-
-  console.log(rangeData);
-
+  // Read new data from file for filter purpose
   const transactions = rangeData.data.data.transactions;
-  // const startTime = new Date("2023-11-15T00:00:00Z"); // Adjust to the start of the generated data
-  // const endTime = new Date("2023-11-30T23:59:59Z"); // Adjust to the end of the generated data
-
   
+  const fileData = fs.readFileSync("./database/transformed_data.json");
+  if(!fileData) {
+    console.error("Empty data file, Please check the file logic !!!");
+    return result;
+  }
 
-  
   transactions.forEach((transaction) => {
     const from = transaction.from;
     const to = transaction.to;
     const amount = transaction.amount;
     const timestamp = new Date(transaction.timestamp);
-    // const timestamp = transaction.timestamp;
 
     // Add users to the result.users array
     if (!result.users.includes(from)) {
@@ -115,6 +119,7 @@ const getTransactionsByTimeRange = (startTime, endTime) => {
       result.users.push(to);
     }
 
+    // Add transaction to the result.transactions array
     if (timestamp >= startTime && timestamp < endTime) {
       result.transactions.push({
         from,
@@ -123,80 +128,55 @@ const getTransactionsByTimeRange = (startTime, endTime) => {
         timestamp: transaction.timestamp,
       });
     }
-
-    //  const timestampString = timestamp.toISOString();
-    //  const startTimeString = startTime.toISOString();
-    //  const endTimeString = endTime.toISOString();
-
-    // // Add transaction to the result.transactions array if it falls within the specified time range
-    // // if (timestamp >= startTime && timestamp <= endTime) {
-    // //   result.transactions.push({ from, to, amount, timestamp });
-
-    // // } else {
-    // //   console.log("Transaction outside time range:", transaction);
-    // //   console.log("Timestamp:", timestamp);
-    // //   console.log("Start Time:", startTime);
-    // //   console.log("End Time:", endTime);
-    // // }
-    //  if (timestampString >= startTimeString && timestampString <= endTimeString) {
-    //     result.transactions.push({ from, to, amount, timestamp });
-    //  }
   });
 
   return result;
 };
-// // Example usage
-// const transactions = data; // Your transaction data
-// const startTime = "2023-11-21T15:49:19";
-// const endTime = "2023-11-21T15:49:21";
 
-// const result = getTransactionsByTimeRange(transactions, startTime, endTime);
-// console.log(result);
+// const generateTestData = () => {
+//   const transactions = [];
+//   const users = [];
 
-const generateTestData = () => {
-  const transactions = [];
-  const users = [];
+//   const startTime = new Date("2023-11-01T00:00:00Z");
+//   const endTime = new Date("2023-11-30T23:59:59Z");
+//   const numTransactions = 150;
 
-  const startTime = new Date("2023-11-01T00:00:00Z");
-  const endTime = new Date("2023-11-30T23:59:59Z");
-  const numTransactions = 150;
+//   for (let i = 0; i < numTransactions; i++) {
+//     const fromUser = `user${Math.floor(Math.random() * 10) + 1}`;
+//     const toUser = `user${Math.floor(Math.random() * 10) + 1}`;
 
-  for (let i = 0; i < numTransactions; i++) {
-    const fromUser = `user${Math.floor(Math.random() * 10) + 1}`;
-    const toUser = `user${Math.floor(Math.random() * 10) + 1}`;
+//     if (!users.includes(fromUser)) {
+//       users.push(fromUser);
+//     }
 
-    if (!users.includes(fromUser)) {
-      users.push(fromUser);
-    }
+//     if (!users.includes(toUser)) {
+//       users.push(toUser);
+//     }
 
-    if (!users.includes(toUser)) {
-      users.push(toUser);
-    }
+//     const timestamp = new Date(
+//       startTime.getTime() +
+//         Math.random() * (endTime.getTime() - startTime.getTime())
+//     ).toISOString();
 
-    const timestamp = new Date(
-      startTime.getTime() +
-        Math.random() * (endTime.getTime() - startTime.getTime())
-    ).toISOString();
+//     transactions.push({
+//       from: fromUser,
+//       to: toUser,
+//       amount: Math.floor(Math.random() * 10) + 1,
+//       timestamp,
+//     });
+//   }
 
-    transactions.push({
-      from: fromUser,
-      to: toUser,
-      amount: Math.floor(Math.random() * 10) + 1,
-      timestamp,
-    });
-  }
-
-  return {
-    data: {
-      users,
-      transactions,
-    },
-  };
-};
+//   return {
+//     data: {
+//       users,
+//       transactions,
+//     },
+//   };
+// };
 
 module.exports = {
   getAllTransactions,
   getOneTransaction,
-  generateTestData,
+  // generateTestData,
   getTransactionsByTimeRange,
 };

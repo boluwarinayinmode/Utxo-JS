@@ -1,8 +1,7 @@
 const express = require("express");
 const  cors = require('cors')
 
-const firstRouter = require("./routes/firstRoute");
-
+const v1_routes = require("./routes/v1_router");
 
 const app = express();
 
@@ -10,8 +9,8 @@ app.use(cors());
 
 const PORT = 5501;
 
-app.use(`/api/firstRoute`, firstRouter);
+app.use(`/api/v1`, v1_routes);
 
 app.listen(PORT, () => {
-    console.log(`API is listening on port ${PORT}`)
+    console.log(`API is listening on port ${PORT}`);
 })
