@@ -1,8 +1,8 @@
-const data = require("../database/test.json");
-const rangeData = require("../database/rangeTestData.json");
 const fs = require("fs");
 
 const getAllTransactions = () => {
+  const raw_data = fs.readFileSync("./database/raw_data.json");
+  const data = raw_data ? JSON.parse(raw_data) : [];
   const input = data;
 
   const users = Array.from(
@@ -50,6 +50,8 @@ const getOneTransaction = (userAddress) => {
     transactions: [],
   };
 
+  const raw_data = fs.readFileSync("./database/raw_data.json");
+  const data = raw_data ? JSON.parse(raw_data) : [];
   data.forEach((transaction) => {
     const inputs = transaction.inputs[0];
     const outputs = transaction.outputs;
@@ -96,7 +98,8 @@ const getTransactionsByTimeRange = (startTime, endTime) => {
     transactions: [],
   };
   // Read new data from file for filter purpose
-  const transactions = rangeData.data.data.transactions;
+  const fs_data = fs.readFileSync("./database/transformed_data.json");
+  const transactions = fs_data ? JSON.parse(fs_data) : [];
   
   const fileData = fs.readFileSync("./database/transformed_data.json");
   if(!fileData) {
@@ -128,6 +131,11 @@ const getTransactionsByTimeRange = (startTime, endTime) => {
         timestamp: transaction.timestamp,
       });
     }
+  });
+
+  // Sort transactions by timestamp
+  result.transactions.sort((a, b) => {
+    return new Date(a.timestamp) - new Date(b.timestamp);
   });
 
   return result;
