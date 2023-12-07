@@ -106,6 +106,7 @@ const getTransactionsByTimeRange = (startTime, endTime) => {
     console.error("Empty data file, Please check the file logic !!!");
     return result;
   }
+  console.log("fileData", fileData.length, startTime, endTime);
 
   transactions.forEach((transaction) => {
     const from = transaction.from;
@@ -123,7 +124,16 @@ const getTransactionsByTimeRange = (startTime, endTime) => {
     }
 
     // Add transaction to the result.transactions array
-    if (timestamp >= startTime && timestamp < endTime) {
+    if(startTime && endTime) {
+      if (timestamp >= startTime && timestamp < endTime) {
+        result.transactions.push({
+          from,
+          to,
+          amount,
+          timestamp: transaction.timestamp,
+        });
+      }
+    } else {
       result.transactions.push({
         from,
         to,
@@ -132,6 +142,8 @@ const getTransactionsByTimeRange = (startTime, endTime) => {
       });
     }
   });
+
+  console.log("result.transactions", result.transactions.length);
 
   // Sort transactions by timestamp
   result.transactions.sort((a, b) => {
